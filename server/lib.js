@@ -1,7 +1,14 @@
 function assigner(names, size, iterations) {
     let people = names.map(name => {
-        return {name: name, paired: [], unPaired: names.slice()};
+        return {name: name};
     });
+    people = people.map(person => {
+        names.forEach(name => {
+            person[name] = false;
+        });
+        return person;
+    });
+    console.log('People:', people);
     let result = iterate([], people, size, iterations);
     // return result.map(iteration => {
     //     return iteration.map(group => {
@@ -25,17 +32,14 @@ function iterate(result, people, size, iterations) {
                 break;
             }
             let candidate = unAssigned[randIndex(unAssigned.length)];
-            // console.log('Candidate:', candidate);
+            console.log('Candidate:', candidate);
             // console.log('Week:', iterationGroups);
-            // console.log('unAssigned:', unAssigned);
+            console.log('unAssigned:', unAssigned);
             let previouslyPaired = false;
             // console.log('Group:', group);
             group.forEach(member => {
-                // console.log('Member:', member);
-                if (
-                    member.unPaired.indexOf(candidate.name) < 0 &&
-                        candidate.unPaired.indexOf(member.name) < 0
-                ) {
+                console.log('Member:', member);
+                if (member[candidate.name] && candidate[member.name]) {
                     previouslyPaired = true;
                 }
             });
@@ -71,30 +75,8 @@ function iterate(result, people, size, iterations) {
 function addPerson(person, group) {
     // console.log('Hitting add person', person, group);
     group.forEach(member => {
-        console.log(
-            'Removing',
-            person.name,
-            'from',
-            member.name,
-            'who still has',
-            member.unPaired
-        );
-        console.log(
-            'Removing',
-            member.name,
-            'from',
-            person.name,
-            'who still has',
-            person.unPaired
-        );
-        member.unPaired.splice(member.unPaired.indexOf(person.name), 1);
-        person.unPaired.splice(person.unPaired.indexOf(member.name), 1);
-        if (person.paired.indexOf(member.name) < 0) {
-            person.paired.push(member.name);
-        }
-        if (member.paired.indexOf(person.name) < 0) {
-            member.paired.push(person.name);
-        }
+        member[person.name] = true;
+        person[member.name] = true;
     });
     group.push(person);
     return group;
