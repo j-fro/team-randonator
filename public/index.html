@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Team Randonator</title>
+    <script src="angular.min.js" charset="utf-8"></script>
+    <script src="script.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="master.css">
+</head>
+
+<body ng-app="rngApp">
+    <main ng-controller="randoController">
+        <form>
+            <input type="text" placeholder="Name" ng-repeat="name in names" ng-model="name.name">
+            <button type="button" ng-click="addLine()">+</button>
+            <input type="number" placeholder="Group Size" ng-model="groupSize" required>
+            <input type="number" placeholder="Iterations" ng-model="iterations" required>
+            <input type="submit" ng-click="submitGroup()">
+        </form>
+        <section id="results">
+            <div ng-repeat="group in result[0]">
+                <div ng-repeat="person in group" class="person-result">
+                    <div class="person-heading">
+                        <h4>{{ person.name }}</h4>
+                    </div>
+
+                    <div ng-repeat="(key, value) in person">
+                        <p ng-hide="key==='name' || key===person.name">{{ key }}: {{ value }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="groups">
+            <div ng-repeat="week in result">
+                <p>Week: {{ $index }}</p>
+                <div ng-repeat="group in week">
+                    <p>Group {{ $index }}</p>
+                    <div ng-repeat="person in group">
+                        <p>{{ person.name }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

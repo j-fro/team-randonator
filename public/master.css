@@ -1,0 +1,16 @@
+.person-result, .person-result p, .person-result div, .person-result div p {
+    display: inline;
+}
+
+.person-result p {
+    width: 100%;
+}
+
+.person-heading {
+    display: inline-block;
+    width: 100%;
+}
+
+#results div {
+    display: inline;
+}
