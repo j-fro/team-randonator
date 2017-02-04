@@ -1,22 +1,20 @@
 function assigner(names, size, iterations) {
     let people = names.map(name => {
-        return {name: name, paired: []};
+        return {name: name, paired: [], unPaired: names.slice()};
     });
     let result = iterate([], people, size, iterations);
-    return result.map(iteration => {
-        return iteration.map(group => {
-            return group.map(person => {
-                console.log('Person:', person.name);
-                return person.name;
-            });
-        });
-    });
+    // return result.map(iteration => {
+    //     return iteration.map(group => {
+    //         return group.map(person => {
+    //             // console.log('Person:', person.name);
+    //             return person.name;
+    //         });
+    //     });
+    // });
+    return result;
 }
 
 function iterate(result, people, size, iterations) {
-    console.log('Iterations:', iterations);
-    console.log('Number of weeks made:', result.length);
-    console.log('Groups:', result);
     let numberOfGroups = people.length / size;
     let iterationGroups = [];
     let unAssigned = people.slice();
@@ -27,35 +25,42 @@ function iterate(result, people, size, iterations) {
                 break;
             }
             let candidate = unAssigned[randIndex(unAssigned.length)];
-            console.log('Candidate:', candidate);
-            console.log('Week:', iterationGroups);
-            console.log('unAssigned:', unAssigned);
+            // console.log('Candidate:', candidate);
+            // console.log('Week:', iterationGroups);
+            // console.log('unAssigned:', unAssigned);
             let previouslyPaired = false;
-            console.log('Group:', group);
+            // console.log('Group:', group);
             group.forEach(member => {
-                console.log('Member:', member);
+                // console.log('Member:', member);
                 if (
-                    member.paired.indexOf(candidate.name) > 0 ||
-                        candidate.paired.indexOf(member.name) > 0
+                    member.unPaired.indexOf(candidate.name) < 0 &&
+                        candidate.unPaired.indexOf(member.name) < 0
                 ) {
                     previouslyPaired = true;
                 }
             });
-            console.log('Candidate, group:', candidate, group);
+            // console.log('Candidate, group:', candidate, group);
             if (!previouslyPaired) {
-                group.forEach(member => {
-                    member.paired.push(candidate.name);
-                    candidate.paired.push(member.name);
-                });
-                group.push(candidate);
+                group = addPerson(candidate, group);
                 unAssigned.splice(unAssigned.indexOf(candidate), 1);
             }
         }
         iterationGroups.push(group);
-        console.log('Week:', iterationGroups);
+        // console.log('Week:', iterationGroups);
+    }
+    if (unAssigned.length > 0) {
+        // console.log('People left:', unAssigned);
+        unAssigned.forEach(person => {
+            // console.log('Trying to assign', person.name);
+            for (let i = 0; i < numberOfGroups; i++) {
+                if (iterationGroups[i].length < size) {
+                    iterationGroups[i] = addPerson(person, iterationGroups[i]);
+                    break;
+                }
+            }
+        });
     }
     result.push(iterationGroups);
-    console.log('People after the week:', people);
     if (iterations > 1) {
         return iterate(result, people, size, iterations - 1);
     } else {
@@ -63,11 +68,43 @@ function iterate(result, people, size, iterations) {
     }
 }
 
+function addPerson(person, group) {
+    // console.log('Hitting add person', person, group);
+    group.forEach(member => {
+        console.log(
+            'Removing',
+            person.name,
+            'from',
+            member.name,
+            'who still has',
+            member.unPaired
+        );
+        console.log(
+            'Removing',
+            member.name,
+            'from',
+            person.name,
+            'who still has',
+            person.unPaired
+        );
+        member.unPaired.splice(member.unPaired.indexOf(person.name), 1);
+        person.unPaired.splice(person.unPaired.indexOf(member.name), 1);
+        if (person.paired.indexOf(member.name) < 0) {
+            person.paired.push(member.name);
+        }
+        if (member.paired.indexOf(person.name) < 0) {
+            member.paired.push(person.name);
+        }
+    });
+    group.push(person);
+    return group;
+}
+
 function randIndex(max) {
     return Math.floor(Math.random() * max);
 }
 
-// console.log(
+// // console.log(
 //     assigner(
 //         [
 //             'Sherrie',
